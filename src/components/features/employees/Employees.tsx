@@ -1,22 +1,31 @@
-import departmentData from "../../../data/departments";
+import type { Department } from "../../../types/department";
 import styles from "./Employees.module.css";
 
-export function Employees() {
-    const departmentListElement = departmentData.map(d => {
-        return <section>
-            <h2>{d.name}</h2>
-            <ul className={styles.employees}>
-                {d.employees.map(e => <li>{e.firstName} {e.lastName}</li>)}
-            </ul>
-        </section>
-    });
+interface EmployeesProps {
+    departments: Department[];
+}
 
-    return(
+export function Employees({ departments }: EmployeesProps) {
+    return (
         <main>
-            <section>
-                <h1>Employees by Department</h1>
-                {departmentListElement}
-            </section>
+            {departments.map((department) => (
+                <section
+                    key={department.name}
+                    className={styles.department}
+                >
+                    <h2>{department.name}</h2>
+
+                    <ul>
+                        {department.employees.map((employee, index) => (
+                            <li
+                                key={`${employee.firstName}-${employee.lastName ?? ""}-${index}`}
+                            >
+                                {employee.firstName} {employee.lastName}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            ))}
         </main>
-    )
+    );
 }
