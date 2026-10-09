@@ -1,67 +1,59 @@
-import { useState } from "react";
 import type { FormEvent } from "react";
-
 import type { Department } from "../../../types/department";
-import type { Employee } from "../../../types/employee";
+import { useFormInput } from "../../../hooks/useFormInput";
+import * as employeeService from "../../../services/employeeService";
 
 interface EmployeeFormProps {
     departments: Department[];
-    onAddEmployee: (
-        employee: Employee,
-        departmentName: string
-    ) => void;
+    onDepartmentsChange: (departments: Department[]) => void;
 }
 
 export function EmployeeForm({
     departments,
-    onAddEmployee,
+    onDepartmentsChange,
 }: EmployeeFormProps) {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [departmentName, setDepartmentName] = useState("");
-    const [validationMessages, setValidationMessages] =
-        useState<string[]>([]);
+    const firstName = useFormInput();
+    const lastName = useFormInput();
+    const departmentName = useFormInput();
 
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        setValidationMessages([]);
-
-        const messages: string[] = [];
-
-        if (firstName.trim().length < 3) {
-            messages.push(
-                "First name must be at least three characters."
-            );
-        }
-
-        const departmentExists = departments.some(
-            (department) =>
-                department.name === departmentName
+        const firstNameValidation = firstName.validate((value) =>
+            employeeService.validateInput(value, "firstName")
         );
 
-        if (!departmentExists) {
-            messages.push(
-                "Please select a department."
-            );
-        }
+        const lastNameValidation = lastName.validate((value) =>
+            employeeService.validateInput(value, "lastName")
+        );
 
-        if (messages.length > 0) {
-            setValidationMessages(messages);
+        const departmentValidation = departmentName.validate((value) =>
+            employeeService.validateInput(value, "departmentName")
+        );
+
+        if (
+            !firstNameValidation.isValid ||
+            !lastNameValidation.isValid ||
+            !departmentValidation.isValid
+        ) {
             return;
         }
 
-        onAddEmployee(
+        const result = employeeService.createEmployee(
             {
-                firstName: firstName.trim(),
-                lastName: lastName.trim() || undefined,
+                firstName: firstName.value,
+                lastName: lastName.value,
             },
-            departmentName
+            departmentName.value
         );
 
-        setFirstName("");
-        setLastName("");
-        setDepartmentName("");
+        if (result.isValid) {
+            onDepartmentsChange(result.departments);
+
+            firstName.reset();
+            lastName.reset();
+            departmentName.reset();
+        }
     }
 
     return (
@@ -77,11 +69,19 @@ export function EmployeeForm({
                     <input
                         id="firstName"
                         type="text"
-                        value={firstName}
+                        value={firstName.value}
                         onChange={(event) =>
-                            setFirstName(event.target.value)
+                            firstName.setValue(event.target.value)
                         }
+                        aria-invalid={firstName.messages.length > 0}
+                        aria-describedby="firstName-messages"
                     />
+
+                    <div id="firstName-messages" aria-live="polite">
+                        {firstName.messages.map((message) => (
+                            <p key={message}>{message}</p>
+                        ))}
+                    </div>
                 </div>
 
                 <div>
@@ -92,11 +92,19 @@ export function EmployeeForm({
                     <input
                         id="lastName"
                         type="text"
-                        value={lastName}
+                        value={lastName.value}
                         onChange={(event) =>
-                            setLastName(event.target.value)
+                            lastName.setValue(event.target.value)
                         }
+                        aria-invalid={lastName.messages.length > 0}
+                        aria-describedby="lastName-messages"
                     />
+
+                    <div id="lastName-messages" aria-live="polite">
+                        {lastName.messages.map((message) => (
+                            <p key={message}>{message}</p>
+                        ))}
+                    </div>
                 </div>
 
                 <div>
@@ -106,10 +114,12 @@ export function EmployeeForm({
 
                     <select
                         id="department"
-                        value={departmentName}
+                        value={departmentName.value}
                         onChange={(event) =>
-                            setDepartmentName(event.target.value)
+                            departmentName.setValue(event.target.value)
                         }
+                        aria-invalid={departmentName.messages.length > 0}
+                        aria-describedby="department-messages"
                     >
                         <option value="">
                             Select a department
@@ -124,17 +134,13 @@ export function EmployeeForm({
                             </option>
                         ))}
                     </select>
-                </div>
 
-                {validationMessages.length > 0 && (
-                    <ul>
-                        {validationMessages.map((message) => (
-                            <li key={message}>
-                                {message}
-                            </li>
+                    <div id="department-messages" aria-live="polite">
+                        {departmentName.messages.map((message) => (
+                            <p key={message}>{message}</p>
                         ))}
-                    </ul>
-                )}
+                    </div>
+                </div>
 
                 <button type="submit">
                     Add Employee

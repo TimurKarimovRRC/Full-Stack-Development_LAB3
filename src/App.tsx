@@ -5,35 +5,13 @@ import { EmployeeForm } from "./components/features/employees/EmployeeForm";
 import { Header } from "./components/layout/header/Header";
 import { Footer } from "./components/layout/footer/Footer";
 
-import departments from "./data/departments";
-
+import { employeeRepo } from "./repositories/employeeRepo";
 import type { Department } from "./types/department";
-import type { Employee } from "./types/employee";
 
 export default function App() {
-    const [departmentList, setDepartmentList] =
-        useState<Department[]>(departments);
-
-    function addEmployee(
-        employee: Employee,
-        departmentName: string
-    ) {
-        setDepartmentList((currentDepartments) =>
-            currentDepartments.map((department) => {
-                if (department.name === departmentName) {
-                    return {
-                        ...department,
-                        employees: [
-                            ...department.employees,
-                            employee,
-                        ],
-                    };
-                }
-
-                return department;
-            })
-        );
-    }
+    const [departmentList, setDepartmentList] = useState<Department[]>(
+        employeeRepo.getDepartments
+    );
 
     return (
         <>
@@ -43,7 +21,7 @@ export default function App() {
 
             <EmployeeForm
                 departments={departmentList}
-                onAddEmployee={addEmployee}
+                onDepartmentsChange={setDepartmentList}
             />
 
             <Footer />
