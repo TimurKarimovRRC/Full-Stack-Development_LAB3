@@ -3,7 +3,7 @@ import { roleData } from "../data/roles";
 import type { Role } from "../types/role";
 import type { Employee } from "../types/employee";
 
-let roles: Role[] = [];
+let roles: Role[] = structuredClone(roleData);
 
 export const organizationRepo = {
     getRoles(): Role[] {
