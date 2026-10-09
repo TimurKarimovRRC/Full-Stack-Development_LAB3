@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { Employees } from "./components/features/employees/Employees";
@@ -9,13 +8,17 @@ import { Header } from "./components/layout/header/Header";
 import { Nav } from "./components/layout/nav/Nav";
 import { Footer } from "./components/layout/footer/Footer";
 
-import { employeeRepo } from "./repositories/employeeRepo";
-import type { Department } from "./types/department";
+import { useEmployees } from "./hooks/useEmployees";
 
 export default function App() {
-    const [departmentList, setDepartmentList] = useState<Department[]>(
-        employeeRepo.getDepartments
-    );
+    const {
+        departments,
+        firstName,
+        lastName,
+        departmentName,
+        errors,
+        handleSubmit,
+    } = useEmployees();
 
     return (
         <>
@@ -32,11 +35,15 @@ export default function App() {
                     path="/employees"
                     element={
                         <>
-                            <Employees departments={departmentList} />
+                            <Employees departments={departments} />
 
                             <EmployeeForm
-                                departments={departmentList}
-                                onDepartmentsChange={setDepartmentList}
+                                departments={departments}
+                                firstName={firstName}
+                                lastName={lastName}
+                                departmentName={departmentName}
+                                errors={errors}
+                                onSubmit={handleSubmit}
                             />
                         </>
                     }

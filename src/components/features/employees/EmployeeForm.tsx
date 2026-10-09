@@ -1,66 +1,34 @@
 import type { FormEvent } from "react";
 import type { Department } from "../../../types/department";
-import { useFormInput } from "../../../hooks/useFormInput";
-import * as employeeService from "../../../services/employeeService";
+
+interface FormField {
+    value: string;
+    setValue: (value: string) => void;
+    messages: string[];
+}
 
 interface EmployeeFormProps {
     departments: Department[];
-    onDepartmentsChange: (departments: Department[]) => void;
+    firstName: FormField;
+    lastName: FormField;
+    departmentName: FormField;
+    errors: string[];
+    onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export function EmployeeForm({
     departments,
-    onDepartmentsChange,
+    firstName,
+    lastName,
+    departmentName,
+    errors,
+    onSubmit,
 }: EmployeeFormProps) {
-    const firstName = useFormInput();
-    const lastName = useFormInput();
-    const departmentName = useFormInput();
-
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-
-        const firstNameValidation = firstName.validate((value) =>
-            employeeService.validateInput(value, "firstName")
-        );
-
-        const lastNameValidation = lastName.validate((value) =>
-            employeeService.validateInput(value, "lastName")
-        );
-
-        const departmentValidation = departmentName.validate((value) =>
-            employeeService.validateInput(value, "departmentName")
-        );
-
-        if (
-            !firstNameValidation.isValid ||
-            !lastNameValidation.isValid ||
-            !departmentValidation.isValid
-        ) {
-            return;
-        }
-
-        const result = employeeService.createEmployee(
-            {
-                firstName: firstName.value,
-                lastName: lastName.value,
-            },
-            departmentName.value
-        );
-
-        if (result.isValid) {
-            onDepartmentsChange(result.departments);
-
-            firstName.reset();
-            lastName.reset();
-            departmentName.reset();
-        }
-    }
-
     return (
         <section>
             <h2>Add Employee</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={onSubmit}>
                 <div>
                     <label htmlFor="firstName">
                         First Name
@@ -140,6 +108,12 @@ export function EmployeeForm({
                             <p key={message}>{message}</p>
                         ))}
                     </div>
+                </div>
+
+                <div aria-live="polite">
+                    {errors.map((message) => (
+                        <p key={message}>{message}</p>
+                    ))}
                 </div>
 
                 <button type="submit">
