@@ -1,5 +1,4 @@
 import type { FormEvent } from "react";
-import type { Department } from "../../../types/department";
 
 interface FormField {
     value: string;
@@ -7,45 +6,46 @@ interface FormField {
     messages: string[];
 }
 
-interface EmployeeFormProps {
-    departments: Department[];
+interface OrganizationFormProps {
     firstName: FormField;
     lastName: FormField;
-    departmentName: FormField;
+    roleTitle: FormField;
     errors: string[];
     onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-export function EmployeeForm({
-    departments,
+export function OrganizationForm({
     firstName,
     lastName,
-    departmentName,
+    roleTitle,
     errors,
     onSubmit,
-}: EmployeeFormProps) {
+}: OrganizationFormProps) {
     return (
         <section>
-            <h2>Add Employee</h2>
+            <h2>Add Person to Organization</h2>
 
             <form onSubmit={onSubmit}>
                 <div>
-                    <label htmlFor="firstName">
+                    <label htmlFor="organization-firstName">
                         First Name
                     </label>
 
                     <input
-                        id="firstName"
+                        id="organization-firstName"
                         type="text"
                         value={firstName.value}
                         onChange={(event) =>
                             firstName.setValue(event.target.value)
                         }
                         aria-invalid={firstName.messages.length > 0}
-                        aria-describedby="firstName-messages"
+                        aria-describedby="organization-firstName-messages"
                     />
 
-                    <div id="firstName-messages" aria-live="polite">
+                    <div
+                        id="organization-firstName-messages"
+                        aria-live="polite"
+                    >
                         {firstName.messages.map((message) => (
                             <p key={message}>{message}</p>
                         ))}
@@ -53,22 +53,25 @@ export function EmployeeForm({
                 </div>
 
                 <div>
-                    <label htmlFor="lastName">
+                    <label htmlFor="organization-lastName">
                         Last Name
                     </label>
 
                     <input
-                        id="lastName"
+                        id="organization-lastName"
                         type="text"
                         value={lastName.value}
                         onChange={(event) =>
                             lastName.setValue(event.target.value)
                         }
                         aria-invalid={lastName.messages.length > 0}
-                        aria-describedby="lastName-messages"
+                        aria-describedby="organization-lastName-messages"
                     />
 
-                    <div id="lastName-messages" aria-live="polite">
+                    <div
+                        id="organization-lastName-messages"
+                        aria-live="polite"
+                    >
                         {lastName.messages.map((message) => (
                             <p key={message}>{message}</p>
                         ))}
@@ -76,35 +79,26 @@ export function EmployeeForm({
                 </div>
 
                 <div>
-                    <label htmlFor="department">
-                        Department
+                    <label htmlFor="organization-role">
+                        Role
                     </label>
 
-                    <select
-                        id="department"
-                        value={departmentName.value}
+                    <input
+                        id="organization-role"
+                        type="text"
+                        value={roleTitle.value}
                         onChange={(event) =>
-                            departmentName.setValue(event.target.value)
+                            roleTitle.setValue(event.target.value)
                         }
-                        aria-invalid={departmentName.messages.length > 0}
-                        aria-describedby="department-messages"
+                        aria-invalid={roleTitle.messages.length > 0}
+                        aria-describedby="organization-role-messages"
+                    />
+
+                    <div
+                        id="organization-role-messages"
+                        aria-live="polite"
                     >
-                        <option value="">
-                            Select a department
-                        </option>
-
-                        {departments.map((department) => (
-                            <option
-                                key={department.name}
-                                value={department.name}
-                            >
-                                {department.name}
-                            </option>
-                        ))}
-                    </select>
-
-                    <div id="department-messages" aria-live="polite">
-                        {departmentName.messages.map((message) => (
+                        {roleTitle.messages.map((message) => (
                             <p key={message}>{message}</p>
                         ))}
                     </div>
@@ -117,7 +111,7 @@ export function EmployeeForm({
                 </div>
 
                 <button type="submit">
-                    Add Employee
+                    Add Person
                 </button>
             </form>
         </section>

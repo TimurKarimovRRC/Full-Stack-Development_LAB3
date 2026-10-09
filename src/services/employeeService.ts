@@ -76,3 +76,6 @@ export function createEmployee(
         departments,
     };
 }
+export function getDepartments() {
+    return employeeRepo.getDepartments();
+}
